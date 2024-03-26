@@ -2,16 +2,21 @@ package com.sky.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.entity.Employee ;
 import com.sky.mapper.EmployeeMapper ;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService ;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +25,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
 * @author 86136
@@ -78,11 +84,15 @@ public class EmployeeServiceImpl  extends ServiceImpl<EmployeeMapper, Employee>
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
         employee.setStatus(StatusConstant.ENABLE);
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
 
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
 
-        employee.setCreateUser(10L);
-        employee.setUpdateUser(10L);
+
+        Long userId = BaseContext.getCurrentId();
+        employee.setCreateUser(userId);
+        employee.setUpdateUser(userId);
 
 //        QueryWrapper<Employee> queryWrapper = new QueryWrapper<>();
 //        queryWrapper.eq("username",employee.getUsername());
@@ -93,6 +103,26 @@ public class EmployeeServiceImpl  extends ServiceImpl<EmployeeMapper, Employee>
 
 
         employeeMapper.insert(employee);
+
+    }
+
+    /**
+     * 分页查询员工
+     * @param employeePageQueryDTO
+     * @return
+     */
+
+    @Override
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+
+        // select * from employee limit 0,10
+        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
+
+        long total = page.getTotal();
+        List<Employee> records = page.getResult();
+
+        return new PageResult(total,records);
     }
 
 
