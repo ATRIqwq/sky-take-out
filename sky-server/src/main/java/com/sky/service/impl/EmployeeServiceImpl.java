@@ -1,21 +1,34 @@
 package com.sky.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
-import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
-import com.sky.mapper.EmployeeMapper;
-import com.sky.service.EmployeeService;
+import com.sky.entity.Employee ;
+import com.sky.mapper.EmployeeMapper ;
+import com.sky.service.EmployeeService ;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-@Service
-public class EmployeeServiceImpl implements EmployeeService {
+import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
+/**
+* @author 86136
+* @description 针对表【employee(员工信息)】的数据库操作Service实现
+* @createDate 2024-03-25 21:10:33
+*/
+@Service
+public class EmployeeServiceImpl  extends ServiceImpl<EmployeeMapper, Employee>
+    implements EmployeeService{
     @Autowired
     private EmployeeMapper employeeMapper;
 
@@ -40,6 +53,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //密码比对
         // TODO 后期需要进行md5加密，然后再进行比对
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
+
         if (!password.equals(employee.getPassword())) {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
@@ -54,4 +69,39 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
+    /**
+     * 新增员工
+     * @param employeeDTO
+     */
+    @Override
+    public void save(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        employee.setStatus(StatusConstant.ENABLE);
+
+        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+
+        employee.setCreateUser(10L);
+        employee.setUpdateUser(10L);
+
+//        QueryWrapper<Employee> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("username",employee.getUsername());
+//        if (this.count(queryWrapper) >0)
+//        {
+//            throw new RuntimeException();
+//        }
+
+
+        employeeMapper.insert(employee);
+    }
+
+
+    @Override
+    public boolean save(Employee entity) {
+        return super.save(entity);
+    }
 }
+
+
+
+
