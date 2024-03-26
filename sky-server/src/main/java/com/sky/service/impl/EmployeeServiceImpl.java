@@ -125,6 +125,19 @@ public class EmployeeServiceImpl  extends ServiceImpl<EmployeeMapper, Employee>
         return new PageResult(total,records);
     }
 
+    /**
+     * 修改员工状态 启用或停用
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Employee employee = new Employee();
+        employee.setId(id);
+        employee.setStatus(status);
+        employeeMapper.updateById(employee);
+    }
+
 
     @Override
     public boolean save(Employee entity) {

@@ -34,4 +34,6 @@ public interface EmployeeService  extends IService<Employee> {
      */
 
     PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    void startOrStop(Integer status, Long id);
 }
