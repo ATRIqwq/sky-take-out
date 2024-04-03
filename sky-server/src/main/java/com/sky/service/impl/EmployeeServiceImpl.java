@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
@@ -11,6 +12,7 @@ import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.enumeration.OperationType;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
@@ -37,6 +39,7 @@ public class EmployeeServiceImpl  extends ServiceImpl<EmployeeMapper, Employee>
     implements EmployeeService{
     @Autowired
     private EmployeeMapper employeeMapper;
+    private static final String SALT = "kano";
 
     /**
      * 员工登录
@@ -80,19 +83,17 @@ public class EmployeeServiceImpl  extends ServiceImpl<EmployeeMapper, Employee>
      * @param employeeDTO
      */
     @Override
+//    @AutoFill(value = OperationType.INSERT)
     public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
         employee.setStatus(StatusConstant.ENABLE);
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-
-
         Long userId = BaseContext.getCurrentId();
         employee.setCreateUser(userId);
         employee.setUpdateUser(userId);
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
 
 //        QueryWrapper<Employee> queryWrapper = new QueryWrapper<>();
 //        queryWrapper.eq("username",employee.getUsername());
@@ -100,7 +101,6 @@ public class EmployeeServiceImpl  extends ServiceImpl<EmployeeMapper, Employee>
 //        {
 //            throw new RuntimeException();
 //        }
-
 
         employeeMapper.insert(employee);
 
@@ -136,6 +136,40 @@ public class EmployeeServiceImpl  extends ServiceImpl<EmployeeMapper, Employee>
         employee.setId(id);
         employee.setStatus(status);
         employeeMapper.updateById(employee);
+    }
+
+    /**
+     * 根据ID查询员工信息
+     * @param id
+     * @return
+     */
+    @Override
+    public Employee findById(Long id) {
+        Employee employee = this.getById(id);
+        employee.setPassword("******");
+        return employee;
+
+    }
+
+
+    /**
+     * 更新员工信息
+     * @param employeeDTO
+     */
+    @Override
+
+    public void updateEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+
+        QueryWrapper<Employee> wrapper = new QueryWrapper<>();
+        wrapper.eq("id",employee.getId());
+        this.update(employee,wrapper);
+
+
     }
 
 
