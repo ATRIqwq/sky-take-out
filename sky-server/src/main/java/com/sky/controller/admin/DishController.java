@@ -3,6 +3,7 @@ package com.sky.controller.admin;
 import com.sky.annotation.AutoFill;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -68,7 +69,7 @@ public class DishController {
      * @return
      */
     @GetMapping("/{id}")
-    @ApiOperation("更新ID查询菜品，用于回显")
+    @ApiOperation("根据ID查询菜品，用于回显")
     public Result<DishVO> getById(@PathVariable Long id){
         DishVO dishVO = dishService.getDishWithFavor(id);
         return Result.success(dishVO);
@@ -87,5 +88,31 @@ public class DishController {
         return Result.success();
     }
 
+    /**
+     * 根据分类ID，获取菜品信息
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/list")
+    @ApiOperation("根据分类ID，获取菜品信息")
+    public Result<List<Dish>> listById(Long categoryId){
+        log.info("根据分类ID，获取菜品信息 :{}",categoryId);
+        List<Dish> list= dishService.listById(categoryId);
+        return Result.success(list);
+
+    }
+
+    /**
+     * 停用或启用菜品
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("停用或启用菜品")
+    public Result StartOrStop(@PathVariable Integer status,Long id){
+        dishService.updateStatus(status,id);
+        return Result.success();
+    }
 
 }
