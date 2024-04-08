@@ -18,3 +18,7 @@ sky:
     access-key-id: LTAI5tHsMcCKzUBsJHdk5NKG
     access-key-secret: 7nguxBT2r7ilgUiaA4JasRon5XLqTP
     bucket-name: web-kano
+
+  wechat:
+    appid: wx4dad2bf6142c34e6
+    secret: 4394ee91fc4a4d240133eae7e8355aa8
