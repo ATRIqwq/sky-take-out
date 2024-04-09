@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sky.context.BaseContext;
 import com.sky.dto.ShoppingCartDTO;
@@ -96,6 +97,53 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         shoppingCart.setUserId(userId);
         List<ShoppingCart> cartList = shoppingCartMapper.list(shoppingCart);
         return cartList;
+    }
+
+    /**
+     * 删除购物车中单个数据
+     * @param shoppingCartDTO
+     * @return
+     */
+    @Override
+    public void deleteItem(ShoppingCartDTO shoppingCartDTO) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO,shoppingCart);
+        Long userId = BaseContext.getCurrentId();
+        shoppingCart.setUserId(userId);
+
+        List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
+        if (list != null && list.size() >0){
+            ShoppingCart item = list.get(0);
+
+            Integer number = item.getNumber();
+
+            if (number == 1){
+                shoppingCartMapper.deleteById(item.getId());
+            } else {
+                item.setNumber(item.getNumber() -1);
+                shoppingCartMapper.updateById(item);
+            }
+
+        }
+
+
+
+
+
+    }
+
+    /**
+     * 清空购物车
+     * @return
+     */
+    @Override
+    public void clear() {
+        Long userId = BaseContext.getCurrentId();
+
+        QueryWrapper<ShoppingCart> wrapper = new QueryWrapper<>();
+        wrapper.lambda().eq(ShoppingCart::getUserId,userId);
+        shoppingCartMapper.delete(wrapper);
+
     }
 }
 

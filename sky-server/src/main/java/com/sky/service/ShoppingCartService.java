@@ -25,4 +25,18 @@ public interface ShoppingCartService extends IService<ShoppingCart> {
      * @return
      */
     List<ShoppingCart> listItem();
+
+    /**
+     * 删除购物车中单个数据
+     * @param shoppingCartDTO
+     * @return
+     */
+    void deleteItem(ShoppingCartDTO shoppingCartDTO);
+
+
+    /**
+     * 清空购物车
+     * @return
+     */
+    void clear();
 }
