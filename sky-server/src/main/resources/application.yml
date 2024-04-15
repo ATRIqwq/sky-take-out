@@ -27,6 +27,12 @@ mybatis:
     #开启驼峰命名
     map-underscore-to-camel-case: true
 
+mybatis-plus:
+  global-config:
+    id-type: 0
+    db-config:
+      id-type: auto
+
 logging:
   level:
     com:
@@ -50,6 +56,14 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
+    mchid: ${sky.wechat.mchid}
+    mchSerialNo: ${sky.wechat.mchSerialNo}
+    privateKeyFilePath: ${sky.wechat.privateKeyFilePath}
+    apiV3Key: ${sky.wechat.apiV3Key}
+    weChatPayCertFilePath: ${sky.wechat.weChatPayCertFilePath}
+    notifyUrl: ${sky.wechat.notifyUrl}
+    refundNotifyUrl: ${sky.wechat.refundNotifyUrl}
+
 
   alioss:
     endpoint: ${sky.alioss.endpoint}

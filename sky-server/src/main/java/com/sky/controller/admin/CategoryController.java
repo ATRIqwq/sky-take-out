@@ -27,7 +27,7 @@ public class CategoryController {
     @ApiOperation("新增菜品分类")
     public Result save(@RequestBody CategoryDTO categoryDTO){
         log.info("新增分类，接收的参数{}",categoryDTO);
-        categoryService.saveCategory(categoryDTO);
+
         return Result.success();
     }
 
